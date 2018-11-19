@@ -1,0 +1,12 @@
+<resources>
+
+    <dimen name="activity_margin">20dp</dimen>
+    <dimen name="activity_margin2">10dp</dimen>
+
+    <dimen name="title_size">16sp</dimen>
+    <dimen name="title_size2">14sp</dimen>
+    <dimen name="title_size3">12sp</dimen>
+    <dimen name="dp10">10dp</dimen>
+    <dimen name="dp5">5dp</dimen>
+
+</resources>

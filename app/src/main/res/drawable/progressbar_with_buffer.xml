@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--进度条的底色-->
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="@color/white_light"/>
+        </shape>
+    </item>
+
+    <!--进度条缓冲的颜色-->
+    <item android:id="@android:id/secondaryProgress">
+        <clip>
+            <shape>
+                <solid android:color="@color/white_trans_80"/>
+            </shape>
+        </clip>
+        <!--<scale-->
+        <!--android:drawable="@color/white_trans_half"-->
+        <!--android:scaleWidth="100%"/>-->
+    </item>
+
+    <!--进度条播放进度的颜色-->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape >
+                <solid android:color="@color/white"/>
+            </shape>
+            <!--<scale-->
+            <!--android:drawable="@color/white"-->
+            <!--android:scaleWidth="100%"/>-->
+        </clip>
+    </item>
+
+</layer-list>
