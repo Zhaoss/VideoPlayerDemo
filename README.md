@@ -1,11 +1,6 @@
 # 自定义高性能播放器, 实现边下边播缓存等功能
 
-[源码下载, 如果对你有所帮助点下star哦](https://github.com/Zhaoss/VideoPlayerDemo)
-
-[演示Demo下载](https://fir.im/VideoPlayerDemo)
-
 ![](https://upload-images.jianshu.io/upload_images/2582948-3f8bedd90aef1c83.gif?imageMogr2/auto-orient/strip)
-
 
 ### 本项目使用播放器是[ijkplay](https://github.com/Bilibili/ijkplayer), 并且进行封装和修改
 ```
