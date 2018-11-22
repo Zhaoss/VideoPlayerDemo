@@ -1,4 +1,4 @@
-# 自定义高性能播放器, 实现边下边播缓存等功能
+# 封装bilibili播放器,自定义边下边播和缓存功能
 
 ![](https://upload-images.jianshu.io/upload_images/2582948-3f8bedd90aef1c83.gif?imageMogr2/auto-orient/strip)
 
