@@ -5,7 +5,6 @@
 
 ![](https://upload-images.jianshu.io/upload_images/2582948-3f8bedd90aef1c83.gif?imageMogr2/auto-orient/strip)
 
-
 ### 本项目使用播放器是[ijkplay](https://github.com/Bilibili/ijkplayer), 并且进行封装和修改
 ```
 主要功能:
@@ -522,3 +521,26 @@ private void playVideoByPosition(int position){
 ```
 ### 至此代码讲解完毕, 亲测在4g网络下视频初始化速度毫秒级, 并且在低性能手机下, 页面来回切换无卡顿. 
 ### 大家如果有不解, 可以查看源码了解更多, 有bug或优化思路 也可以提[issues](https://github.com/Zhaoss/VideoPlayerDemo/issues)
+
+---
+
+# MIT License
+Copyright (c) 2018 Zhaoss (838198688@qq.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
