@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.TextureView;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -48,14 +47,6 @@ public class PlayTextureView extends FrameLayout {
 
         mTextureView = new TextureView(getContext());
         mTextureView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mTextureView.addOnLayoutChangeListener(new OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if(mVideoWidth!=0 && mVideoHeight!=0){
-                    setVideoCenter(mTextureView.getWidth(), mTextureView.getHeight(), mVideoWidth, mVideoHeight);
-                }
-            }
-        });
 
         if(surfaceTexture == null) {
             mSurfaceTexture = newSurfaceTexture();
@@ -125,6 +116,14 @@ public class PlayTextureView extends FrameLayout {
     public void setVideoSize(int videoWidth, int videoHeight){
         this.mVideoWidth = videoWidth;
         this.mVideoHeight = videoHeight;
+        mTextureView.post(new Runnable() {
+            @Override
+            public void run() {
+                if(mVideoWidth!=0 && mVideoHeight!=0){
+                    setVideoCenter(mTextureView.getWidth(), mTextureView.getHeight(), mVideoWidth, mVideoHeight);
+                }
+            }
+        });
     }
 
     public void setSurfaceTextureListener(SimpleSurfaceTextureListener surfaceTextureListener){

@@ -13,17 +13,13 @@ public class MainVideoBean implements Serializable{
     private String userName;
     private String content;
     private String coverUrl;
-    private int videoWidth;
-    private int videoHeight;
 
-    public MainVideoBean(int avatarRes, String videoUrl, String userName, String content, String coverUrl, int videoWidth, int videoHeight) {
+    public MainVideoBean(int avatarRes, String videoUrl, String userName, String content, String coverUrl) {
         this.avatarRes = avatarRes;
         this.videoUrl = videoUrl;
         this.userName = userName;
         this.content = content;
         this.coverUrl = coverUrl;
-        this.videoWidth = videoWidth;
-        this.videoHeight = videoHeight;
     }
 
     public int getAvatarRes() {
@@ -64,21 +60,5 @@ public class MainVideoBean implements Serializable{
 
     public void setCoverUrl(String coverUrl) {
         this.coverUrl = coverUrl;
-    }
-
-    public int getVideoWidth() {
-        return videoWidth;
-    }
-
-    public void setVideoWidth(int videoWidth) {
-        this.videoWidth = videoWidth;
-    }
-
-    public int getVideoHeight() {
-        return videoHeight;
-    }
-
-    public void setVideoHeight(int videoHeight) {
-        this.videoHeight = videoHeight;
     }
 }

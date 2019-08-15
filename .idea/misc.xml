@@ -1,36 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
-    <option name="myNullables">
-      <value>
-        <list size="4">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
-          <item index="3" class="java.lang.String" itemvalue="android.support.annotation.Nullable" />
-        </list>
-      </value>
-    </option>
-    <option name="myNotNulls">
-      <value>
-        <list size="4">
-          <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
-          <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
-          <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
-          <item index="3" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
-        </list>
-      </value>
-    </option>
-  </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state>
         <expanded-state>
-          <State>
-            <id />
-          </State>
+          <State />
           <State>
             <id>Abstraction issuesJava</id>
           </State>
@@ -50,7 +24,7 @@
             <id>Cloning issuesJava</id>
           </State>
           <State>
-            <id>Code maturity issuesJava</id>
+            <id>Code maturityJava</id>
           </State>
           <State>
             <id>Code style issuesJava</id>
@@ -62,13 +36,16 @@
             <id>Groovy</id>
           </State>
           <State>
+            <id>ImportsJava</id>
+          </State>
+          <State>
             <id>Inheritance issuesJava</id>
           </State>
           <State>
-            <id>Initialization issuesJava</id>
+            <id>InitializationJava</id>
           </State>
           <State>
-            <id>Internationalization issuesJava</id>
+            <id>InternationalizationJava</id>
           </State>
           <State>
             <id>InternationalizationLintAndroid</id>
@@ -77,28 +54,22 @@
             <id>J2ME issuesJava</id>
           </State>
           <State>
-            <id>JUnit issuesJava</id>
-          </State>
-          <State>
             <id>Java</id>
           </State>
           <State>
-            <id>Javadoc issuesJava</id>
+            <id>JavadocJava</id>
           </State>
           <State>
             <id>LintAndroid</id>
           </State>
           <State>
-            <id>Logging issuesJava</id>
-          </State>
-          <State>
-            <id>Naming conventionsJava</id>
+            <id>LoggingJava</id>
           </State>
           <State>
             <id>Numeric issuesJava</id>
           </State>
           <State>
-            <id>Performance issuesJava</id>
+            <id>PerformanceJava</id>
           </State>
           <State>
             <id>PerformanceLintAndroid</id>
@@ -110,10 +81,10 @@
             <id>Probable bugsJava</id>
           </State>
           <State>
-            <id>Resource management issuesJava</id>
+            <id>Resource managementJava</id>
           </State>
           <State>
-            <id>Security issuesJava</id>
+            <id>SecurityJava</id>
           </State>
           <State>
             <id>SecurityLintAndroid</id>
@@ -122,15 +93,20 @@
             <id>Serialization issuesJava</id>
           </State>
           <State>
-            <id>TestNGJava</id>
+            <id>Threading issuesJava</id>
           </State>
           <State>
-            <id>Threading issuesJava</id>
+            <id>UsabilityLintAndroid</id>
           </State>
           <State>
             <id>toString() issuesJava</id>
           </State>
         </expanded-state>
+        <selected-state>
+          <State>
+            <id>Android</id>
+          </State>
+        </selected-state>
       </profile-state>
     </entry>
   </component>
@@ -139,46 +115,5 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="SvnConfiguration">
-    <configuration>$USER_HOME$/.subversion</configuration>
-  </component>
-  <component name="masterDetails">
-    <states>
-      <state key="Copyright.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="ProjectJDKs.UI">
-        <settings>
-          <last-edited>1.8</last-edited>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="ScopeChooserConfigurable.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-    </states>
   </component>
 </project>

@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -16,6 +17,7 @@ import com.zhaoss.videoplayerdemo.bean.MainVideoBean;
 import com.zhaoss.videoplayerdemo.util.IntentUtil;
 import com.zhaoss.videoplayerdemo.util.MediaPlayerTool;
 import com.zhaoss.videoplayerdemo.util.MyUtil;
+import com.zhaoss.videoplayerdemo.util.StatusBarUtil;
 import com.zhaoss.videoplayerdemo.view.VideoTouchView;
 
 import java.util.ArrayList;
@@ -124,6 +126,8 @@ public class VideoDetailsActivity extends BaseActivity {
             vh.pb_video.setVisibility(View.GONE);
             vh.iv_cover.setVisibility(View.GONE);
             vh.playTextureView.setRotation(mMediaPlayerTool.getRotation());
+            vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
+            setVideoSize(vh, mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
         }else{
             //显示正在加载的界面
             vh.pb_video.setVisibility(View.VISIBLE);
@@ -168,7 +172,9 @@ public class VideoDetailsActivity extends BaseActivity {
                     public void run() {
                         vh.iv_cover.setVisibility(View.GONE);
                     }
-                }, 300);
+                }, 200);
+                vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
+                setVideoSize(vh, mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
             }
             @Override
             public void onRotationInfo(int rotation) {
@@ -217,6 +223,23 @@ public class VideoDetailsActivity extends BaseActivity {
             mMediaPlayerTool.setSurfaceTexture(vh.playTextureView.getSurfaceTexture());
             mMediaPlayerTool.prepare();
         }
+    }
+
+    private void setVideoSize(VideoDetailsAdapter.MyViewHolder vh, int videoWidth, int videoHeight){
+
+        float videoRatio = videoWidth * 1f / videoHeight;
+        int windowWidth = MyUtil.getWindowWidth();
+        int windowHeight = MyUtil.getWindowHeight() + StatusBarUtil.getStatusHeight(mContext);
+        float windowRatio = MyUtil.getWindowWidth()*1f/MyUtil.getWindowHeight();
+        ViewGroup.LayoutParams layoutParams = vh.videoTouchView.getLayoutParams();
+        if (videoRatio >= windowRatio) {
+            layoutParams.width = windowWidth;
+            layoutParams.height = (int) (layoutParams.width / videoRatio);
+        } else {
+            layoutParams.height = windowHeight;
+            layoutParams.width = (int) (layoutParams.height * videoRatio);
+        }
+        vh.videoTouchView.setLayoutParams(layoutParams);
     }
 
     long changeProgressTime;

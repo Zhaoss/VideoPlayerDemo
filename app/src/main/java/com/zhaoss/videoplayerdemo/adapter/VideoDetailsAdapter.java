@@ -15,8 +15,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.zhaoss.videoplayerdemo.R;
 import com.zhaoss.videoplayerdemo.bean.MainVideoBean;
-import com.zhaoss.videoplayerdemo.util.MyUtil;
-import com.zhaoss.videoplayerdemo.util.StatusBarUtil;
 import com.zhaoss.videoplayerdemo.view.PlayTextureView;
 import com.zhaoss.videoplayerdemo.view.VideoTouchView;
 
@@ -52,32 +50,11 @@ public class VideoDetailsAdapter extends RecyclerView.Adapter {
         vh.pb_play_progress.setSecondaryProgress(0);
         vh.pb_play_progress.setProgress(0);
 
-        vh.playTextureView.setVideoSize(mainVideoBean.getVideoWidth(), mainVideoBean.getVideoHeight());
-
         Glide.with(mContext).load(mainVideoBean.getAvatarRes()).into(vh.iv_avatar);
         Glide.with(mContext).load(mainVideoBean.getCoverUrl()).into(vh.iv_cover);
 
         vh.tv_content.setText(mainVideoBean.getContent());
         vh.tv_name.setText(mainVideoBean.getUserName());
-
-        setVideoSize(vh, mainVideoBean.getVideoWidth(), mainVideoBean.getVideoHeight());
-    }
-
-    private void setVideoSize(MyViewHolder vh, int videoWidth, int videoHeight){
-
-        float videoRatio = videoWidth * 1f / videoHeight;
-        int windowWidth = MyUtil.getWindowWidth();
-        int windowHeight = MyUtil.getWindowHeight() + StatusBarUtil.getStatusHeight(mContext);
-        float windowRatio = MyUtil.getWindowWidth()*1f/MyUtil.getWindowHeight();
-        ViewGroup.LayoutParams layoutParams = vh.videoTouchView.getLayoutParams();
-        if (videoRatio >= windowRatio) {
-            layoutParams.width = windowWidth;
-            layoutParams.height = (int) (layoutParams.width / videoRatio);
-        } else {
-            layoutParams.height = windowHeight;
-            layoutParams.width = (int) (layoutParams.height * videoRatio);
-        }
-        vh.videoTouchView.setLayoutParams(layoutParams);
     }
 
     @Override

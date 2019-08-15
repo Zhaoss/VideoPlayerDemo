@@ -24,7 +24,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
 public class CacheMediaDataSource implements IMediaDataSource{
 
-    private String mUrl;
+    private String mVideoData;
     private String mMd5;
 
     //视频长度
@@ -38,9 +38,9 @@ public class CacheMediaDataSource implements IMediaDataSource{
     //本地文件流
     private RandomAccessFile localStream;
 
-    public CacheMediaDataSource(String url) {
-        this.mUrl = url;
-        mMd5 = MyUtil.MD5(mUrl);
+    public CacheMediaDataSource(String videoData) {
+        this.mVideoData = videoData;
+        mMd5 = MyUtil.MD5(videoData);
     }
 
 
@@ -201,7 +201,13 @@ public class CacheMediaDataSource implements IMediaDataSource{
     //初始化一个视频流出来, 可能是本地或网络
     private void initInputStream() throws IOException{
 
-        File file = checkCache(mMd5);
+        File file;
+        if(!mVideoData.startsWith("http")){
+            file = new File(mVideoData);
+        }else {
+            file = checkCache(mMd5);
+        }
+
         if(file != null){
             //更新一下缓存文件
             VideoLRUCacheUtil.updateVideoCacheBean(mMd5, file.getAbsolutePath(), file.length());
@@ -243,7 +249,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder()
                 .header("RANGE", "bytes=" + startIndex + "-")
-                .url(mUrl)
+                .url(mVideoData)
                 .get()
                 .build();
         Call call = okHttpClient.newCall(request);

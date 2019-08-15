@@ -177,6 +177,7 @@ public class MainActivity extends BaseActivity {
             vh.pb_video.setVisibility(View.GONE);
             vh.iv_play_icon.setVisibility(View.GONE);
             vh.iv_cover.setVisibility(View.GONE);
+            vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
         }else{
             //显示正在加载的界面
             vh.iv_play_icon.setVisibility(View.GONE);
@@ -194,7 +195,6 @@ public class MainActivity extends BaseActivity {
         myVideoListener = new MediaPlayerTool.VideoListener() {
             @Override
             public void onStart() {
-                vh.iv_play_icon.setVisibility(View.GONE);
                 vh.pb_video.setVisibility(View.GONE);
                 //防止闪屏
                 vh.iv_cover.postDelayed(new Runnable() {
@@ -202,7 +202,9 @@ public class MainActivity extends BaseActivity {
                     public void run() {
                         vh.iv_cover.setVisibility(View.GONE);
                     }
-                }, 300);
+                }, 200);
+                vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
+                vh.iv_play_icon.setVisibility(View.GONE);
             }
             @Override
             public void onStop() {

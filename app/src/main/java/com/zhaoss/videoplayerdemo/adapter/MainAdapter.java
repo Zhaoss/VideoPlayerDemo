@@ -44,7 +44,6 @@ public class MainAdapter extends RecyclerView.Adapter{
         final MyViewHolder vh = (MyViewHolder) holder;
         MainVideoBean mainVideoBean = mainVideoBeanList.get(position);
 
-        vh.playTextureView.setVideoSize(mainVideoBean.getVideoWidth(), mainVideoBean.getVideoHeight());
         Glide.with(mContext).load(mainVideoBean.getAvatarRes()).into(vh.iv_avatar);
         vh.tv_content.setText(mainVideoBean.getContent());
         vh.tv_name.setText(mainVideoBean.getUserName());

@@ -1,4 +1,4 @@
-# 自定义高性能播放器, 实现边下边播缓存等功能
+### v1.1 增加本地视频播放功能, 视频会自动初始化宽高 不用手动传视频宽高了
 
 [源码下载, 如果对你有所帮助点下star哦](https://github.com/Zhaoss/VideoPlayerDemo)
 [演示Demo下载](https://fir.im/VideoPlayerDemo)
