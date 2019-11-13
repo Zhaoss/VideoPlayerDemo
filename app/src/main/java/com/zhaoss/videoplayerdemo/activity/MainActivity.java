@@ -15,7 +15,7 @@ import com.zhaoss.videoplayerdemo.adapter.MainAdapter;
 import com.zhaoss.videoplayerdemo.bean.MainVideoBean;
 import com.zhaoss.videoplayerdemo.util.DataUtil;
 import com.zhaoss.videoplayerdemo.util.MediaPlayerTool;
-import com.zhaoss.videoplayerdemo.util.MyUtil;
+import com.zhaoss.videoplayerdemo.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -225,7 +225,7 @@ public class MainActivity extends BaseActivity {
             }
             @Override
             public void onPlayProgress(long currentPosition) {
-                String date = MyUtil.fromMMss(mMediaPlayerTool.getDuration() - currentPosition);
+                String date = Util.fromMMss(mMediaPlayerTool.getDuration() - currentPosition);
                 vh.tv_play_time.setText(date);
             }
         };

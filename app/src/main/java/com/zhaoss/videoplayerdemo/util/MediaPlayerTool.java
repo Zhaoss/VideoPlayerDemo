@@ -1,16 +1,22 @@
 package com.zhaoss.videoplayerdemo.util;
 
 import android.graphics.SurfaceTexture;
-import android.os.Binder;
-import android.os.Handler;
-import android.os.Message;
+import android.text.TextUtils;
 import android.view.Surface;
 
 import com.zhaoss.videoplayerdemo.view.PlayTextureView;
 
+import java.io.File;
 import java.lang.ref.SoftReference;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
@@ -22,7 +28,11 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMediaPlayer.OnErrorListener,
         IMediaPlayer.OnBufferingUpdateListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnInfoListener {
 
-    public final static int PLAY_PROGRESS = 1;
+    //是否使用自定义的缓存架构
+    public static final boolean USE_MY_CHECK = false;
+
+    //ijkio协议
+    public static final String IJK_CACHE_HEAD = "ijkio:cache:ffio:";
 
     private IMediaPlayer mMediaPlayer;
     private VideoListener mVideoListener;
@@ -37,12 +47,12 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
     private float mVolume;
 
     //加载bilibili库成功
-    private boolean loadIjkSucc = false;
+    private boolean loadIjkSucc;
 
     private SoftReference<PlayTextureView> srPlayTextureView;
+    private String mVideoUrl;
     private CacheMediaDataSource mMediaDataSource;
 
-    //这里会自动初始化so库 有些手机会找不到so, 会自动使用系统的播放器
     private MediaPlayerTool(){
         try {
             IjkMediaPlayer.loadLibrariesOnce(null);
@@ -100,12 +110,6 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
             return mMediaPlayer.isLooping();
         }
         return false;
-    }
-
-    public class MyBinder extends Binder{
-        public MediaPlayerTool getService(){
-            return MediaPlayerTool.this;
-        }
     }
 
     public void onDestroy() {
@@ -172,12 +176,45 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
         }
     }
 
+    private void checkPath(){
+        //初始化缓存路径
+        File file = new File(VideoLRUCacheUtil.CACHE_DIR_PATH);
+        if(!file.exists()){
+            file.mkdirs();
+        }
+    }
+
     public void setDataSource(String url){
+        setDataSource(url, true);
+    }
+
+    public void setDataSource(String url, boolean isCache){
         try {
-            mMediaDataSource = new CacheMediaDataSource(url);
-            mMediaPlayer.setDataSource(mMediaDataSource);
+            if(USE_MY_CHECK){
+                mMediaDataSource = new CacheMediaDataSource(url);
+                mMediaPlayer.setDataSource(mMediaDataSource);
+            }else{
+                if(isCache){
+                    mVideoUrl = url;
+                    mMediaPlayer.setDataSource(mVideoUrl);
+                }else{
+                    mVideoUrl = IJK_CACHE_HEAD+url;
+                    mMediaPlayer.setDataSource(mVideoUrl);
+                    if(mMediaPlayer instanceof IjkMediaPlayer) {
+                        checkPath();
+                        IjkMediaPlayer ijkMediaPlayer = (IjkMediaPlayer) mMediaPlayer;
+                        String name = Util.MD5(mVideoUrl);
+                        String videoPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".v";
+                        String indexPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".i";
+                        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_file_path", videoPath);
+                        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_map_path", indexPath);
+                        VideoLRUCacheUtil.updateVideoCacheBean(name, videoPath, indexPath);
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            onError(mMediaPlayer, 0, 0);
         }
     }
 
@@ -188,6 +225,7 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
             }
         }catch (Throwable e){
             e.printStackTrace();
+            onError(mMediaPlayer, 0, 0);
         }
     }
 
@@ -204,8 +242,9 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
 
     public void reset(){
 
-        if(myHandler.hasMessages(PLAY_PROGRESS)) {
-            myHandler.removeMessages(PLAY_PROGRESS);
+        if(subscribe != null){
+            subscribe.dispose();
+            subscribe = null;
         }
 
         if(srPlayTextureView != null){
@@ -225,10 +264,6 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
         if(mVideoListener != null){
             mVideoListener.onStop();
             mVideoListener = null;
-        }
-
-        if (mMediaDataSource != null) {
-            mMediaDataSource = null;
         }
 
         if(mMediaPlayer!=null && playHasCode.get()!=mMediaPlayer.hashCode()) {
@@ -276,6 +311,8 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
         if(loadIjkSucc){
             IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec", 1);
+            ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "parse_cache_map", 1);
+            ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "auto_save_map", 1);
             ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-auto-rotate", 1);
 
             mMediaPlayer = ijkMediaPlayer;
@@ -316,10 +353,21 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
 
     @Override
     public boolean onError(IMediaPlayer iMediaPlayer, int what, int extra) {
-        if(mMediaDataSource != null) {
-            mMediaDataSource.onError();
+        if(mVideoUrl.startsWith(IJK_CACHE_HEAD)){
+            String rawUrl = mVideoUrl.substring(mVideoUrl.indexOf(IJK_CACHE_HEAD));
+            setDataSource(rawUrl, false);
+        }else{
+            if (mVideoListener != null) {
+                mVideoListener.onStop();
+                mVideoListener = null;
+            }
+            if(!TextUtils.isEmpty(mVideoUrl)){
+                VideoLRUCacheUtil.deleteVideoBean(mVideoUrl);
+            }
+            if(mMediaDataSource != null) {
+                mMediaDataSource.onError();
+            }
         }
-        reset();
         return true;
     }
 
@@ -335,24 +383,35 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
         if(mMediaPlayer != null) {
             mMediaPlayer.start();
             mDuration = iMediaPlayer.getDuration();
-            myHandler.sendEmptyMessage(PLAY_PROGRESS);
+            loopPlayProgress();
             if (mVideoListener != null) {
                 mVideoListener.onStart();
             }
         }
     }
 
-    private Handler myHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case PLAY_PROGRESS:
-                    if(mVideoListener!=null && mMediaPlayer!=null && mMediaPlayer.isPlaying()){
-                        mVideoListener.onPlayProgress(mMediaPlayer.getCurrentPosition());
+    private Disposable subscribe;
+    private void loopPlayProgress(){
+        subscribe = Observable.interval(0, 100, TimeUnit.MILLISECONDS)
+                .flatMap(new Function<Long, ObservableSource<Long>>() {
+                    @Override
+                    public ObservableSource<Long> apply(Long aLong) throws Exception {
+                        return Observable.just(aLong + 1);
                     }
-                    myHandler.sendEmptyMessageDelayed(PLAY_PROGRESS, 100);
-                    break;
-            }
-        }
-    };
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        if(mVideoListener!=null && mMediaPlayer!=null && mMediaPlayer.isPlaying()){
+                            mVideoListener.onPlayProgress(mMediaPlayer.getCurrentPosition());
+                        }else{
+                            if(subscribe != null){
+                                subscribe.dispose();
+                                subscribe = null;
+                            }
+                        }
+                    }
+                });
+    }
 }

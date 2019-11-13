@@ -16,7 +16,7 @@ import com.zhaoss.videoplayerdemo.adapter.VideoDetailsAdapter;
 import com.zhaoss.videoplayerdemo.bean.MainVideoBean;
 import com.zhaoss.videoplayerdemo.util.IntentUtil;
 import com.zhaoss.videoplayerdemo.util.MediaPlayerTool;
-import com.zhaoss.videoplayerdemo.util.MyUtil;
+import com.zhaoss.videoplayerdemo.util.Util;
 import com.zhaoss.videoplayerdemo.util.StatusBarUtil;
 import com.zhaoss.videoplayerdemo.view.VideoTouchView;
 
@@ -203,8 +203,8 @@ public class VideoDetailsActivity extends BaseActivity {
                 int pro = (int) (currentPosition*1f/ mMediaPlayerTool.getDuration()*100);
                 vh.pb_play_progress.setProgress(pro);
 
-                String currentPositionStr = MyUtil.fromMMss(currentPosition);
-                String videoDurationStr = MyUtil.fromMMss(mMediaPlayerTool.getDuration());
+                String currentPositionStr = Util.fromMMss(currentPosition);
+                String videoDurationStr = Util.fromMMss(mMediaPlayerTool.getDuration());
                 vh.tv_progress.setText(currentPositionStr + "/" + videoDurationStr);
             }
             @Override
@@ -228,9 +228,9 @@ public class VideoDetailsActivity extends BaseActivity {
     private void setVideoSize(VideoDetailsAdapter.MyViewHolder vh, int videoWidth, int videoHeight){
 
         float videoRatio = videoWidth * 1f / videoHeight;
-        int windowWidth = MyUtil.getWindowWidth();
-        int windowHeight = MyUtil.getWindowHeight() + StatusBarUtil.getStatusHeight(mContext);
-        float windowRatio = MyUtil.getWindowWidth()*1f/MyUtil.getWindowHeight();
+        int windowWidth = Util.getWindowWidth();
+        int windowHeight = Util.getWindowHeight() + StatusBarUtil.getStatusHeight(mContext);
+        float windowRatio = Util.getWindowWidth()*1f/ Util.getWindowHeight();
         ViewGroup.LayoutParams layoutParams = vh.videoTouchView.getLayoutParams();
         if (videoRatio >= windowRatio) {
             layoutParams.width = windowWidth;
@@ -255,8 +255,8 @@ public class VideoDetailsActivity extends BaseActivity {
             changeProgressTime = mMediaPlayerTool.getDuration();
         }
 
-        String changeTimeStr = MyUtil.fromMMss(changeProgressTime);
-        String rawTime = MyUtil.fromMMss(mMediaPlayerTool.getDuration());
+        String changeTimeStr = Util.fromMMss(changeProgressTime);
+        String rawTime = Util.fromMMss(mMediaPlayerTool.getDuration());
         vh.tv_change_progress.setText(changeTimeStr+" / "+rawTime);
 
         if(changeProgressTime > mMediaPlayerTool.getCurrentPosition()){

@@ -1,6 +1,5 @@
 package com.zhaoss.videoplayerdemo.util;
 
-import com.zhaoss.videoplayerdemo.MyApplication;
 import com.zhaoss.videoplayerdemo.bean.VideoCacheBean;
 
 import java.io.ByteArrayOutputStream;
@@ -10,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -22,7 +23,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
  * Created by zhaoshuang on 2018/11/9.
  */
 
-public class CacheMediaDataSource implements IMediaDataSource{
+public class CacheMediaDataSource implements IMediaDataSource {
 
     private String mVideoData;
     private String mMd5;
@@ -40,9 +41,26 @@ public class CacheMediaDataSource implements IMediaDataSource{
 
     public CacheMediaDataSource(String videoData) {
         this.mVideoData = videoData;
-        mMd5 = MyUtil.MD5(videoData);
+        mMd5 = MD5(videoData);
     }
 
+    public String MD5(String s) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] bytes = md.digest(s.getBytes(StandardCharsets.UTF_8));
+
+            final char[] HEX_DIGITS = "0123456789ABCDEF".toCharArray();
+            StringBuilder ret = new StringBuilder(bytes.length * 2);
+            for (int i=0; i<bytes.length; i++) {
+                ret.append(HEX_DIGITS[(bytes[i] >> 4) & 0x0f]);
+                ret.append(HEX_DIGITS[bytes[i] & 0x0f]);
+            }
+            return ret.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     /**
      *
@@ -93,7 +111,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
     }
 
     //同步数据流
-    private boolean syncInputStream(long position) throws IOException{
+    private boolean syncInputStream(long position) throws IOException {
 
         boolean isWriteVideo = true;
         //判断两次读取数据是否连续
@@ -122,7 +140,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
     /**
      * 从inputStream里读取size大小的数据
      */
-    private byte[] readByteBySize(InputStream inputStream, int size) throws IOException{
+    private byte[] readByteBySize(InputStream inputStream, int size) throws IOException {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -142,7 +160,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
     /**
      * 从inputStream里读取size大小的数据
      */
-    private byte[] readByteBySize(RandomAccessFile inputStream, int size) throws IOException{
+    private byte[] readByteBySize(RandomAccessFile inputStream, int size) throws IOException {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -162,11 +180,11 @@ public class CacheMediaDataSource implements IMediaDataSource{
     /**
      * 删除file一部分字节, 从position到file.size
      */
-    private void deleteFileByPosition(long position) throws IOException{
+    private void deleteFileByPosition(long position) throws IOException {
 
         FileInputStream in = new FileInputStream(localVideoFile);
 
-        File tempFile = VideoLRUCacheUtil.createTempFile(MyApplication.mContext);
+        File tempFile = VideoLRUCacheUtil.createTempFile();
         FileOutputStream out = new FileOutputStream(tempFile);
 
         byte[] buf = new byte[8192];
@@ -199,7 +217,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
     }
 
     //初始化一个视频流出来, 可能是本地或网络
-    private void initInputStream() throws IOException{
+    private void initInputStream() throws IOException {
 
         File file;
         if(!mVideoData.startsWith("http")){
@@ -208,22 +226,26 @@ public class CacheMediaDataSource implements IMediaDataSource{
             file = checkCache(mMd5);
         }
 
-        if(file != null){
-            //更新一下缓存文件
-            VideoLRUCacheUtil.updateVideoCacheBean(mMd5, file.getAbsolutePath(), file.length());
-            //读取的本地缓存文件
-            isCacheVideo = true;
-            localVideoFile = file;
-            //开启一个本地视频流
-            localStream = new RandomAccessFile(localVideoFile, "rw");
-            contentLength = file.length();
+        if(file!=null){
+            if(file.exists()) {
+                //更新一下缓存文件
+                VideoLRUCacheUtil.updateVideoCacheBean(mMd5, file.getAbsolutePath(), "");
+                //读取的本地缓存文件
+                isCacheVideo = true;
+                localVideoFile = file;
+                //开启一个本地视频流
+                localStream = new RandomAccessFile(localVideoFile, "rw");
+                contentLength = file.length();
+            }else{
+                throw new IOException("文件不存在");
+            }
         }else {
             //没有缓存 开启一个网络流, 并且开启一个缓存流, 实现视频缓存
             isCacheVideo = false;
             //开启一个网络视频流
             networkInPutStream = openHttpClient(0);
             //要写入的本地缓存文件
-            localVideoFile = VideoLRUCacheUtil.createCacheFile(MyApplication.mContext, mMd5, contentLength);
+            localVideoFile = VideoLRUCacheUtil.createCacheFile(mMd5);
             //要写入的本地缓存视频流
             localStream = new RandomAccessFile(localVideoFile, "rw");
         }
@@ -244,7 +266,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
     }
 
     //打开一个网络视频流, 从startIndex开始下载
-    private InputStream openHttpClient(int startIndex) throws IOException{
+    private InputStream openHttpClient(int startIndex) throws IOException {
 
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder()
@@ -280,7 +302,7 @@ public class CacheMediaDataSource implements IMediaDataSource{
             localStream = null;
         }
 
-        if(localVideoFile.length()!=contentLength){
+        if(localVideoFile!=null && localVideoFile.length()!=contentLength){
             localVideoFile.delete();
         }
     }

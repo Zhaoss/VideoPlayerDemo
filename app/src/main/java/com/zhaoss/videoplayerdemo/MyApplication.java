@@ -19,6 +19,6 @@ public class MyApplication extends Application {
         this.mContext = this;
 
         //清理超过大小和存储时间的视频缓存文件
-        VideoLRUCacheUtil.checkCacheSize(mContext);
+        VideoLRUCacheUtil.checkCacheSize();
     }
 }

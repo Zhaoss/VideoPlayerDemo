@@ -22,6 +22,8 @@ public class VideoCacheBean {
     private int playCount;
     @Column("videoPath")
     private String videoPath;
+    @Column("indexPath")
+    private String indexPath;
     @Column("fileSize")
     private long fileSize;
 
@@ -55,6 +57,14 @@ public class VideoCacheBean {
 
     public void setVideoPath(String videoPath) {
         this.videoPath = videoPath;
+    }
+
+    public String getIndexPath() {
+        return indexPath;
+    }
+
+    public void setIndexPath(String indexPath) {
+        this.indexPath = indexPath;
     }
 
     public long getFileSize() {

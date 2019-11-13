@@ -1,6 +1,5 @@
 package com.zhaoss.videoplayerdemo.util;
 
-import android.content.Context;
 import android.os.Environment;
 
 import com.zhaoss.videoplayerdemo.bean.VideoCacheBean;
@@ -16,59 +15,56 @@ import java.util.ArrayList;
 
 public class VideoLRUCacheUtil {
 
-    //缓存最大空间 200M
+    public static final String CACHE_DIR_PATH = Environment.getExternalStorageDirectory() + "/VideoPlayerDemo/";
+    //缓存最大空间 200M 单位是字节
     public static final long maxDirSize = 1024*1024*200;
     //缓存最大时间 7天
     public static final long maxCacheTime = 1000*60*60*24*7;
 
-    //更新缓存文件的播放次数和最后播放时间
-    public static void updateVideoCacheBean(String md5, String videoPath, long fileSize){
+    public static void updateVideoCacheBean(String md5, String videoPath, String indexPath){
 
-        VideoCacheBean videoCacheBean = VideoCacheDBUtil.query(md5);
-        if(videoCacheBean == null){
-            videoCacheBean = new VideoCacheBean();
-            videoCacheBean.setKey(md5);
-            videoCacheBean.setVideoPath(videoPath);
-            videoCacheBean.setFileSize(fileSize);
-        }
-        videoCacheBean.setPlayCount(videoCacheBean.getPlayCount()+1);
+        VideoCacheBean videoCacheBean = new VideoCacheBean();
+        videoCacheBean.setKey(md5);
         videoCacheBean.setPlayTime(System.currentTimeMillis());
-
+        videoCacheBean.setVideoPath(videoPath);
+        videoCacheBean.setIndexPath(indexPath);
+        videoCacheBean.setPlayCount(videoCacheBean.getPlayCount()+1);
         VideoCacheDBUtil.save(videoCacheBean);
     }
 
-    public static File createTempFile(Context context) throws IOException{
-        File tempFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), System.currentTimeMillis()+"");
+    public static File createTempFile() throws IOException {
+        File tempFile = new File(CACHE_DIR_PATH, System.currentTimeMillis()+"");
         if(!tempFile.exists()){
             tempFile.createNewFile();
         }
         return tempFile;
     }
 
-    public static File createCacheFile(Context context, String md5, long fileSize) throws IOException{
+    public static File createCacheFile(String md5) throws IOException{
 
         //创建一个视频缓存文件, 在data/data目录下
-        File filesDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        File filesDir = new File(CACHE_DIR_PATH);
 
         File cacheFile = new File(filesDir, md5);
         if(!cacheFile.exists()) {
             cacheFile.createNewFile();
         }
         //将缓存信息存到数据库
-        VideoLRUCacheUtil.updateVideoCacheBean(md5, cacheFile.getAbsolutePath(), fileSize);
+        VideoLRUCacheUtil.updateVideoCacheBean(md5, cacheFile.getAbsolutePath(), "");
         return cacheFile;
     }
 
-    public static void checkCacheSize(Context context){
+    public static void checkCacheSize(){
 
         ArrayList<VideoCacheBean> videoCacheList = VideoCacheDBUtil.query();
 
-        //检查一下数据库里面的缓存文件是否存在
         for (VideoCacheBean bean : videoCacheList){
             if(bean.getFileSize() == 0){
                 File videoFile = new File(bean.getVideoPath());
-                //如果文件不存在或者文件大小不匹配, 那么删除
-                if(!videoFile.exists() && videoFile.length()!=bean.getFileSize()){
+                if(videoFile.exists()){
+                    bean.setFileSize(videoFile.length());
+                    VideoCacheDBUtil.save(bean);
+                }else{
                     VideoCacheDBUtil.delete(bean);
                 }
             }
@@ -90,15 +86,22 @@ public class VideoLRUCacheUtil {
             }
         }
 
-        //删除不符合规则的缓存
-        deleteDirRoom(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), VideoCacheDBUtil.query());
+        deleteDirRoom(new File(CACHE_DIR_PATH), VideoCacheDBUtil.query());
+    }
+
+    public static void deleteVideoBean(String url){
+        VideoCacheBean bean = VideoCacheDBUtil.query(Util.MD5(url));
+        if(bean != null){
+            VideoCacheDBUtil.delete(bean);
+            new File(bean.getVideoPath()).delete();
+        }
     }
 
     private static void deleteDirRoom(File dir, ArrayList<VideoCacheBean> videoCacheList){
         if(dir.exists()) {
             if(dir.isDirectory()) {
                 File[] files = dir.listFiles();
-                if(files != null){
+                if(files != null) {
                     for (File f : files) {
                         deleteDirRoom(f, videoCacheList);
                     }
@@ -113,7 +116,7 @@ public class VideoLRUCacheUtil {
 
     private static boolean isVideoExists(File file, ArrayList<VideoCacheBean> videoCacheList){
         for (VideoCacheBean bean : videoCacheList) {
-            if(file.getAbsolutePath().equals(bean.getVideoPath())){
+            if(file.getAbsolutePath().equals(bean.getVideoPath()) || file.getAbsolutePath().equals(bean.getIndexPath())){
                 return true;
             }
         }
