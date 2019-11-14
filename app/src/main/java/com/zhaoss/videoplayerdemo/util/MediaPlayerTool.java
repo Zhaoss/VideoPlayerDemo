@@ -28,9 +28,6 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMediaPlayer.OnErrorListener,
         IMediaPlayer.OnBufferingUpdateListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnInfoListener {
 
-    //是否使用自定义的缓存架构
-    public static final boolean USE_MY_CHECK = false;
-
     //ijkio协议
     public static final String IJK_CACHE_HEAD = "ijkio:cache:ffio:";
 
@@ -190,27 +187,27 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
 
     public void setDataSource(String url, boolean isCache){
         try {
-            if(USE_MY_CHECK){
-                mMediaDataSource = new CacheMediaDataSource(url);
-                mMediaPlayer.setDataSource(mMediaDataSource);
-            }else{
-                if(isCache){
-                    mVideoUrl = url;
-                    mMediaPlayer.setDataSource(mVideoUrl);
-                }else{
-                    mVideoUrl = IJK_CACHE_HEAD+url;
-                    mMediaPlayer.setDataSource(mVideoUrl);
-                    if(mMediaPlayer instanceof IjkMediaPlayer) {
-                        checkPath();
-                        IjkMediaPlayer ijkMediaPlayer = (IjkMediaPlayer) mMediaPlayer;
-                        String name = Util.MD5(mVideoUrl);
-                        String videoPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".v";
-                        String indexPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".i";
-                        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_file_path", videoPath);
-                        ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_map_path", indexPath);
-                        VideoLRUCacheUtil.updateVideoCacheBean(name, videoPath, indexPath);
-                    }
+
+            //自定义缓存架构
+            //mMediaDataSource = new CacheMediaDataSource(url);
+            //mMediaPlayer.setDataSource(mMediaDataSource);
+
+            if(isCache){
+                mVideoUrl = IJK_CACHE_HEAD+url;
+                mMediaPlayer.setDataSource(mVideoUrl);
+                if(mMediaPlayer instanceof IjkMediaPlayer) {
+                    checkPath();
+                    IjkMediaPlayer ijkMediaPlayer = (IjkMediaPlayer) mMediaPlayer;
+                    String name = Util.MD5(mVideoUrl);
+                    String videoPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".v";
+                    String indexPath = VideoLRUCacheUtil.CACHE_DIR_PATH+name+".i";
+                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_file_path", videoPath);
+                    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "cache_map_path", indexPath);
+                    VideoLRUCacheUtil.updateVideoCacheBean(name, videoPath, indexPath);
                 }
+            }else{
+                mVideoUrl = url;
+                mMediaPlayer.setDataSource(mVideoUrl);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -354,7 +351,7 @@ public class MediaPlayerTool implements IMediaPlayer.OnCompletionListener, IMedi
     @Override
     public boolean onError(IMediaPlayer iMediaPlayer, int what, int extra) {
         if(mVideoUrl.startsWith(IJK_CACHE_HEAD)){
-            String rawUrl = mVideoUrl.substring(mVideoUrl.indexOf(IJK_CACHE_HEAD));
+            String rawUrl = mVideoUrl.substring(IJK_CACHE_HEAD.length());
             setDataSource(rawUrl, false);
         }else{
             if (mVideoListener != null) {
