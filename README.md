@@ -1,6 +1,6 @@
 ### v1.1 增加本地视频播放功能, 视频会自动初始化宽高 不用手动传视频宽高了
 
-[源码下载, 如果对你有所帮助点下star哦](https://github.com/Zhaoss/VideoPlayerDemo)
+[源码下载](https://github.com/Zhaoss/VideoPlayerDemo)
 [演示Demo下载](https://fir.im/VideoPlayerDemo)
 
 ![](https://upload-images.jianshu.io/upload_images/2582948-3f8bedd90aef1c83.gif?imageMogr2/auto-orient/strip)
